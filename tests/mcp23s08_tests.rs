@@ -51,12 +51,23 @@ fn new_rejects_bad_hw_address() {
     // No SPI transactions expected
     let mut spi = SpiMock::new(&[]);
     let err = Mcp23s08::new(spi.clone(), 4)
-        .err()
-        .expect("new() should reject invalid hardware address (>=4)");
+        .err().unwrap();
+
     match err {
         Error::BadAddress => {}
         other => panic!("unexpected error: {other:?}"),
     }
+    spi.done();
+}
+#[test]
+fn new_accepts_addr_3() {
+    // начальные значения регистров, которые драйвер читает
+    let expectations = init_expectations_for_new(3, 0xFF, 0x00);
+    let mut spi = SpiMock::new(&expectations);
+
+    let dev = Mcp23s08::new(spi.clone(), 3).expect("addr 3 is valid");
+
+    drop(dev);
     spi.done();
 }
 
