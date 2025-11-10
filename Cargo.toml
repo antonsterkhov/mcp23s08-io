@@ -4,9 +4,14 @@ version = "0.1.0"
 edition = "2024"
 
 
+[workspace]
+members = [".", "examples/esp32io"]
 
 
-[dependencies]
+[lib]
+path = "src/lib.rs"
+
+[workspace.dependencies]
 
 embedded-hal = "1.0.0"
 

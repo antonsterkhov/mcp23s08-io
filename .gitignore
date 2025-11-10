@@ -1,3 +1,4 @@
 /target
 /.idea
 /examples/esp32io/target
+/examples/.idea
