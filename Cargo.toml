@@ -7,6 +7,9 @@ edition = "2024"
 [workspace]
 members = [".", "examples/esp32io"]
 
+resolver = "2"
+
+default-members = ["."]
 
 [lib]
 path = "src/lib.rs"

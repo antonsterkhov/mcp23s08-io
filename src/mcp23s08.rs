@@ -32,6 +32,7 @@ impl Pin {
 pub enum Polarity {
     Normal,
     Inverted,
+    
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
