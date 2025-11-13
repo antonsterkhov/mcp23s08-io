@@ -39,20 +39,18 @@ pub enum InterruptMode {
     CompareToDefault,
 }
 
-pub struct Mcp23s08<SPI> {
+pub struct Mcp23s08async<SPI> {
     spi: SPI,
     hw_addr: u8,
     olat: u8,
     iodir: u8,
 }
 
-impl<SPI, E> Mcp23s08<SPI>
+impl<SPI, E> Mcp23s08async<SPI>
 where
     SPI: SpiDevice<Error = E>,
 {
-    /// Создать новое устройство MCP23S08.
-    ///
-    /// `hw_addr` — аппаратный адрес (A0..A1): 0..=3.
+
     pub async fn new(mut spi: SPI, hw_addr: u8) -> Result<Self, Error<E>> {
         if hw_addr > 3 {
             return Err(Error::BadAddress);
@@ -72,7 +70,7 @@ where
         Ok(this)
     }
 
-    /// Вернуть "handle" для конкретного пина.
+
     pub fn pin<'a>(&'a mut self, pin: Pin) -> GpioPin<'a, SPI> {
         GpioPin { dev: self, pin }
     }
@@ -140,7 +138,7 @@ where
         self.write_reg(Reg::GPIO, self.olat).await
     }
 
-    /// Прямое управление OLAT (если нужно вручную синхронизировать).
+
     pub async fn write_olat(&mut self, value: u8) -> Result<(), Error<E>> {
         self.olat = value;
         self.write_reg(Reg::OLAT, value).await
@@ -179,13 +177,11 @@ where
 
     #[inline]
     fn opcode_write(&self) -> u8 {
-        // 0b0100[A1:A0]0
         0x40 | ((self.hw_addr & 0x03) << 1)
     }
 
     #[inline]
     fn opcode_read(&self) -> u8 {
-        // 0b0100[A1:A0]1
         0x40 | ((self.hw_addr & 0x03) << 1) | 1
     }
 
@@ -224,9 +220,9 @@ enum Reg {
 
 
 
-/// "Пиновый" helper для асинхронной работы с отдельным выводом.
+
 pub struct GpioPin<'a, SPI> {
-    dev: &'a mut Mcp23s08<SPI>,
+    dev: &'a mut Mcp23s08async<SPI>,
     pin: Pin,
 }
 
