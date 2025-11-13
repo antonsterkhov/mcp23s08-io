@@ -16,9 +16,11 @@ path = "src/lib.rs"
 
 [workspace.dependencies]
 embedded-hal = "1.0.0"
+embedded-hal-async = "1.0.0"
 
 [dependencies]
 embedded-hal.workspace = true
+embedded-hal-async.workspace = true
 
 [dev-dependencies]
 embedded-hal-mock = {version = "0.11.1",features = ["eh1"]}
