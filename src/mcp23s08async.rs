@@ -50,7 +50,6 @@ impl<SPI, E> Mcp23s08async<SPI>
 where
     SPI: SpiDevice<Error = E>,
 {
-
     pub async fn new(mut spi: SPI, hw_addr: u8) -> Result<Self, Error<E>> {
         if hw_addr > 3 {
             return Err(Error::BadAddress);
@@ -69,7 +68,6 @@ where
         this.olat = this.read_reg(Reg::OLAT).await?;
         Ok(this)
     }
-
 
     pub fn pin<'a>(&'a mut self, pin: Pin) -> GpioPin<'a, SPI> {
         GpioPin { dev: self, pin }
@@ -103,11 +101,7 @@ where
         self.write_reg(Reg::GPPU, mask).await
     }
 
-    pub async fn set_pin_polarity(
-        &mut self,
-        pin: Pin,
-        pol: Polarity,
-    ) -> Result<(), Error<E>> {
+    pub async fn set_pin_polarity(&mut self, pin: Pin, pol: Polarity) -> Result<(), Error<E>> {
         let mut ipol = self.read_reg(Reg::IPOL).await?;
         match pol {
             Polarity::Normal => ipol &= !pin.bit(),
@@ -137,7 +131,6 @@ where
         }
         self.write_reg(Reg::GPIO, self.olat).await
     }
-
 
     pub async fn write_olat(&mut self, value: u8) -> Result<(), Error<E>> {
         self.olat = value;
@@ -218,9 +211,6 @@ enum Reg {
     OLAT = 0x0A,
 }
 
-
-
-
 pub struct GpioPin<'a, SPI> {
     dev: &'a mut Mcp23s08async<SPI>,
     pin: Pin,
@@ -252,5 +242,10 @@ where
 
     pub async fn is_set_low(&mut self) -> Result<bool, Error<E>> {
         Ok(!self.is_set_high().await?)
+    }
+
+    pub async fn toggle(&mut self) -> Result<(), Error<E>> {
+        let current = self.dev.read_pin(self.pin).await?;
+        self.dev.write_pin(self.pin, !current).await
     }
 }

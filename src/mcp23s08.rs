@@ -3,6 +3,7 @@ use embedded_hal::digital::Error as DigitalError;
 use embedded_hal::digital::ErrorKind;
 use embedded_hal::spi::{Operation, SpiDevice};
 
+use crate::mcp23s08async::GpioPin;
 
 #[derive(Debug)]
 pub enum Error<SpiE> {
@@ -32,7 +33,6 @@ impl Pin {
 pub enum Polarity {
     Normal,
     Inverted,
-    
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -53,7 +53,6 @@ impl<SPI, E> Mcp23s08<SPI>
 where
     SPI: SpiDevice<Error = E>,
 {
-
     pub fn new(spi: SPI, hw_addr: u8) -> Result<Self, Error<E>> {
         if hw_addr > 3 {
             return Err(Error::BadAddress);
@@ -255,7 +254,6 @@ enum Reg {
     OLAT = 0x0A,
 }
 
-
 impl<E: Debug> DigitalError for Error<E> {
     #[inline]
     fn kind(&self) -> ErrorKind {
@@ -295,7 +293,7 @@ where
     E: Debug,
 {
     fn set_high(&mut self) -> Result<(), Self::Error> {
-       self.dev.write_pin(self.pin, true)
+        self.dev.write_pin(self.pin, true)
     }
     fn set_low(&mut self) -> Result<(), Self::Error> {
         self.dev.write_pin(self.pin, false)
@@ -312,5 +310,15 @@ where
     }
     fn is_set_low(&mut self) -> Result<bool, Self::Error> {
         Ok(!self.is_set_high()?)
+    }
+}
+
+impl<'a, SPI, E> GpioPin<'a, SPI, E>
+where
+    SPI: SpiDevice<Error = E>,
+    E: Debug,
+{
+    fn toggle(&mut self) -> Result<(), Self::Error> {
+        self.dev.write_pin(pin, !self.dev.read_pin(pin))
     }
 }
