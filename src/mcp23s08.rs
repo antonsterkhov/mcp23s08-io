@@ -3,8 +3,6 @@ use embedded_hal::digital::Error as DigitalError;
 use embedded_hal::digital::ErrorKind;
 use embedded_hal::spi::{Operation, SpiDevice};
 
-use crate::mcp23s08async::GpioPin;
-
 #[derive(Debug)]
 pub enum Error<SpiE> {
     Spi(SpiE),
@@ -319,9 +317,8 @@ where
     E: Debug,
 {
     pub fn toggle(&mut self) -> Result<(), Error<E>> {
-        
         let current = self.dev.read_pin(self.pin)?;
-        
+
         self.dev.write_pin(self.pin, !current)
     }
 }
