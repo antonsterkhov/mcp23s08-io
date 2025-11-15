@@ -313,12 +313,15 @@ where
     }
 }
 
-impl<'a, SPI, E> GpioPin<'a, SPI, E>
+impl<'a, SPI, E> GpioPin<'a, SPI>
 where
     SPI: SpiDevice<Error = E>,
     E: Debug,
 {
-    fn toggle(&mut self) -> Result<(), Self::Error> {
-        self.dev.write_pin(pin, !self.dev.read_pin(pin))
+    pub fn toggle(&mut self) -> Result<(), Error<E>> {
+        
+        let current = self.dev.read_pin(self.pin)?;
+        
+        self.dev.write_pin(self.pin, !current)
     }
 }
